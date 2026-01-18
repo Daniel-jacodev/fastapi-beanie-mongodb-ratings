@@ -39,8 +39,7 @@ sistema_avaliacoes/
 
 ⚙️ Como Executar o Projeto
 1. Clonar o repositório
-git clone [https://github.com/SEU_USUARIO/NOME_DO_REPO.git](https://github.com/SEU_USUARIO/NOME_DO_REPO.git)
-cd NOME_DO_REPO
+git clone https://github.com/Daniel-jacodev/fastapi-beanie-mongodb-ratings.git
 
 2. Configurar o Ambiente Virtual (Linux)python3 -m venv .venv
 source .venv/bin/activate
@@ -58,4 +57,5 @@ PYTHONPATH=. python popular_banco.py
 5. Iniciar a API
 uvicorn app.main:app --reload
 ```
+
 # fastapi-beanie-mongodb-ratings
