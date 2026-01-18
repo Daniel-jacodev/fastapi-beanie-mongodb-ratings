@@ -1,0 +1,47 @@
+===========================================================
+      SISTEMA DE AVALIAÇÕES DE MÍDIAS - DIVISÃO DE TAREFAS
+===========================================================
+
+GRUPO: Daniel Jacó, Gabriel Dias, Evely Paz
+TECNOLOGIAS: FastAPI, MongoDB, Beanie ODM, Python 3.13
+
+-----------------------------------------------------------
+1. DANIEL JACÓ
+-----------------------------------------------------------
+Responsável pelo desenvolvimento das rotas e lógica de:
+- Mídias (Midia):
+    * CRUD completo de mídias.
+    * Implementação de Busca Parcial e Case-insensitive (Regex).
+    * Listagem com Paginação.
+- Avaliações (Avaliação):
+    * Registro de notas e comentários.
+    * Filtros por relacionamento (Avaliações por Mídia/Usuário).
+    * Implementação do Ranking (Top 15) via Aggregation Pipeline.
+Configuração de Banco de Dados (Global):
+- Integração com MongoDB Atlas e Suporte para MongoDB Local.
+
+-----------------------------------------------------------
+2. GABRIEL DIAS
+-----------------------------------------------------------
+Responsável pelo desenvolvimento das rotas e lógica de:
+- Usuários (Utilizador):
+    * Criação e gerenciamento de perfis de usuários.
+    * Listagem paginada de utilizadores.
+- Gêneros (Genero):
+    * CRUD de categorias/gêneros.
+    * Organização taxonômica para vinculação com mídias.
+
+-----------------------------------------------------------
+3. EVELY PAZ
+-----------------------------------------------------------
+Responsável pela arquitetura de dados e infraestrutura:
+- Models (Documentos Beanie):
+    * Definição de Schemas Pydantic (Base, Create, Document).
+    * Implementação de relacionamentos assíncronos (Link/Backlink).
+    * Validação de dados e tipos (Python 3.13 + Pydantic v2).
+- Script de População (Seed):
+    * Desenvolvimento do script 'popular_banco.py'.
+    * Criação de massa de dados para testes de volumetria e paginação.
+    * Automação para setup inicial em ambientes Local e Atlas.
+
+-----------------------------------------------------------

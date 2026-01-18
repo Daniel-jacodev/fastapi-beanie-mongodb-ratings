@@ -1,28 +1,31 @@
-from typing import List, Optional
 from beanie import Document, Link, PydanticObjectId
 from .genero import Genero
-from pydantic import BaseModel
-
+from pydantic import BaseModel, ConfigDict
 
 class MidiaBase(BaseModel):
     titulo: str
     tipo: str
     ano: int
-    sinopse: Optional[str] = None
+    sinopse: str | None = None
+    
+    model_config = ConfigDict(from_attributes=True)
 
 class MidiaCreate(MidiaBase):
-    generos_ids: List[PydanticObjectId] = []
+    generos_ids: list[PydanticObjectId] = []
 
-
-class Midia(Document, MidiaBase):
-    generos: List[Link[Genero]] = []
+class Midia(Document):
+    titulo: str
+    tipo: str
+    ano: int
+    sinopse: str | None = None
+    generos: list[Link[Genero]] = []
 
     class Settings:
         name = "midias"
 
 class MidiaUpdate(BaseModel):
-    titulo: Optional[str] = None
-    tipo: Optional[str] = None
-    ano: Optional[int] = None
-    sinopse: Optional[str] = None
-    generos_ids: Optional[List[PydanticObjectId]] = None
+    titulo: str | None = None
+    tipo: str | None = None
+    ano: int | None = None
+    sinopse: str | None = None
+    generos_ids: list[PydanticObjectId] | None = None

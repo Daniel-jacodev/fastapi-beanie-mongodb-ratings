@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from app.models.avaliacao import Avaliacao, AvalicaoCreate, AvalicaoUpdate
+from app.models.avaliacao import Avaliacao, AvaliacaoCreate, AvaliacaoUpdate # Corrigido typo
 from app.models.utilizador import Utilizador
 from app.models.midia import Midia
-from typing import List
+# removido typing List
 from beanie import PydanticObjectId, Link
 from pydantic import EmailStr
 from fastapi_pagination import Page
@@ -10,19 +10,16 @@ from fastapi_pagination.ext.beanie import apaginate
 
 router = APIRouter()
 
-# 1. Criar avaliaão
-@router.post("/", response_model=Avaliacao)
-async def criar_avaliacao(avaliacao_in: AvalicaoCreate):
-   
+# 1. Criar avaliação
+@router.post("/", response_model=Avaliacao, status_code=201)
+async def criar_avaliacao(avaliacao_in: AvaliacaoCreate):
     utilizador = await Utilizador.get(avaliacao_in.utilizador_id)
     if not utilizador:
         raise HTTPException(status_code=404, detail="Utilizador não encontrado")
     
-  
     midia = await Midia.get(avaliacao_in.midia_id)
     if not midia:
         raise HTTPException(status_code=404, detail="Mídia não encontrada")
-    
 
     nova_avaliacao = Avaliacao(
         utilizador=Link(utilizador),
@@ -37,7 +34,7 @@ async def criar_avaliacao(avaliacao_in: AvalicaoCreate):
 # 2. Listar todos
 @router.get("/", response_model=Page[Avaliacao])
 async def listar_avaliacoes():
-    return await apaginate(Avaliacao.find())
+    return await apaginate(Avaliacao.find(fetch_links=True).sort(-Avaliacao.id))
 
 # 3. Obter por ID
 @router.get("/{avaliacao_id}", response_model=Avaliacao)
@@ -57,7 +54,7 @@ async def obter_avaliacoes_por_utilizador(utilizador_email: EmailStr):
     return await apaginate(Avaliacao.find(
         Avaliacao.utilizador.id == utilizador.id,
         fetch_links=True
-    ))
+    ).sort(-Avaliacao.id))
 
 # 5. Obter avaliações por mídia
 @router.get("/midia/{midia_titulo}", response_model=Page[Avaliacao])
@@ -69,11 +66,11 @@ async def obter_avaliacoes_por_midia(midia_titulo: str):
     return await apaginate(Avaliacao.find(
         Avaliacao.midia.id == midia.id,
         fetch_links=True
-    ))
+    ).sort(-Avaliacao.id))
 
 # 6. Atualizar
 @router.put("/{avaliacao_id}", response_model=Avaliacao)
-async def atualizar_avaliacao(avaliacao_id: PydanticObjectId, dados_novos: AvalicaoUpdate) -> Avaliacao:
+async def atualizar_avaliacao(avaliacao_id: PydanticObjectId, dados_novos: AvaliacaoUpdate):
     avaliacao = await Avaliacao.get(avaliacao_id)
     if not avaliacao:
         raise HTTPException(status_code=404, detail="Avaliação não encontrada")
@@ -85,32 +82,22 @@ async def atualizar_avaliacao(avaliacao_id: PydanticObjectId, dados_novos: Avali
     return avaliacao
 
 # 7. Deletar
-@router.delete("/{avaliacao_id}")
+@router.delete("/{avaliacao_id}", status_code=204)
 async def deletar_avaliacao(avaliacao_id: PydanticObjectId):
     avaliacao = await Avaliacao.get(avaliacao_id)
     if not avaliacao:
         raise HTTPException(status_code=404, detail="Avaliação não encontrada")
     await avaliacao.delete()
-    return {"message": "Avaliação removida com sucesso"}
+    return None
 
 
-# 8. Ranking por notas (Top 15 Melhores)
-@router.get("/ranking/top15")
+# 8. Ranking por notas (Top 15)
+@router.get("/ranking/top15", response_model=list[dict])
 async def obter_top_15_ranking():
     pipeline = [
-        {
-            "$group": {
-                "_id": "$midia.$id",
-                "media_nota": {"$avg": "$pontuacao"},
-                "total_avaliacoes": {"$sum": 1}
-            }
-        },
-        {
-            "$sort": {"media_nota": -1}
-        },
-        {
-            "$limit": 15
-        }
+        {"$group": {"_id": "$midia.$id", "media_nota": {"$avg": "$pontuacao"}, "total_avaliacoes": {"$sum": 1}}},
+        {"$sort": {"media_nota": -1}},
+        {"$limit": 15}
     ]
     
     colecao = Avaliacao.get_pymongo_collection()
