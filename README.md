@@ -43,7 +43,6 @@ git clone https://github.com/Daniel-jacodev/fastapi-beanie-mongodb-ratings.git
 
 2. Configurar o Ambiente Virtual (Linux)python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
 
 3. Variáveis de Ambiente
 Crie um arquivo .env na raiz do projeto:

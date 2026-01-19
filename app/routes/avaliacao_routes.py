@@ -2,11 +2,11 @@ from fastapi import APIRouter, HTTPException
 from app.models.avaliacao import Avaliacao, AvaliacaoCreate, AvaliacaoUpdate # Corrigido typo
 from app.models.utilizador import Utilizador
 from app.models.midia import Midia
-# removido typing List
 from beanie import PydanticObjectId, Link
 from pydantic import EmailStr
 from fastapi_pagination import Page
 from fastapi_pagination.ext.beanie import apaginate
+import re
 
 router = APIRouter()
 
@@ -22,8 +22,8 @@ async def criar_avaliacao(avaliacao_in: AvaliacaoCreate):
         raise HTTPException(status_code=404, detail="Mídia não encontrada")
 
     nova_avaliacao = Avaliacao(
-        utilizador=Link(utilizador),
-        midia=Link(midia),
+        utilizador=utilizador,
+        midia=midia,          
         pontuacao=avaliacao_in.pontuacao,
         comentario=avaliacao_in.comentario
     )
@@ -59,7 +59,8 @@ async def obter_avaliacoes_por_utilizador(utilizador_email: EmailStr):
 # 5. Obter avaliações por mídia
 @router.get("/midia/{midia_titulo}", response_model=Page[Avaliacao])
 async def obter_avaliacoes_por_midia(midia_titulo: str):
-    midia = await Midia.find_one(Midia.titulo == midia_titulo)
+    midia = await Midia.find_one({"titulo": {"$regex": f"^{midia_titulo}$", "$options": "i"}})
+    
     if not midia:
         raise HTTPException(status_code=404, detail="Mídia não encontrada")
 
@@ -100,7 +101,7 @@ async def obter_top_15_ranking():
         {"$limit": 15}
     ]
     
-    colecao = Avaliacao.get_pymongo_collection()
+    colecao = Avaliacao.get_motor_collection()
     cursor = colecao.aggregate(pipeline)
     
     resultados = []
