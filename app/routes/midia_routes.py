@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 from app.models.midia import Midia, MidiaCreate, MidiaUpdate
 from app.models.genero import Genero
-# Removido typing List (Feedback 8)
 from beanie import PydanticObjectId, Link
 from fastapi_pagination import Page
 from fastapi_pagination.ext.beanie import apaginate

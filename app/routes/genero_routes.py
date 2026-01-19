@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
 from app.models.genero import Genero, GeneroCreate
-# Removido typing List (Feedback 8)
 from beanie import PydanticObjectId
 from fastapi_pagination import Page
 from fastapi_pagination.ext.beanie import apaginate
